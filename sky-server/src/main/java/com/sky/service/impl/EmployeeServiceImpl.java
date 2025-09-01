@@ -69,21 +69,15 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public void save(EmployeeDTO employeeDTO) {
         Employee employee = new Employee();
-
         // 对象属性拷贝
         BeanUtils.copyProperties(employeeDTO, employee);
-
         // 设置账号状态
         employee.setStatus(StatusConstant.ENABLE);
-
         // 设置密码
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
-
         // 设置创建时间和修改时间
-        LocalDateTime now = LocalDateTime.now();
-        employee.setCreateTime(now);
-        employee.setUpdateTime(now);
-
+        employee.setCreateTime(LocalDateTime.now());
+        employee.setUpdateTime(LocalDateTime.now());
         // 记录创建人和修改人ID
         Long id = BaseContext.getCurrentId();
         employee.setCreateUser(id);
@@ -93,14 +87,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
+    public PageResult<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
         PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
         Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);
 
         long total = page.getTotal();
         List<Employee> result = page.getResult();
 
-        return new PageResult(total, result);
+        return new PageResult<>(total, result);
     }
 
     @Override

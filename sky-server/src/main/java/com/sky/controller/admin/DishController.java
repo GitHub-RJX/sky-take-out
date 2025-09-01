@@ -84,6 +84,12 @@ public class DishController {
         return Result.success(dishService.getByIdWithFlavor(id));
     }
 
+    /**
+     * 更新菜品信息
+     *
+     * @param dishDTO 菜品更新请求数据
+     * @return 更新请求响应结果
+     */
     @PutMapping
     @ApiOperation("更新菜品信息")
     public Result update(@RequestBody DishDTO dishDTO) {
