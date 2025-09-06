@@ -34,8 +34,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     /**
      * 员工登录
      *
-     * @param employeeLoginDTO
-     * @return
+     * @param employeeLoginDTO 员工登录请求数据
+     * @return 员工实体数据
      */
     public Employee login(EmployeeLoginDTO employeeLoginDTO) {
         String username = employeeLoginDTO.getUsername();
@@ -45,20 +45,17 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = employeeMapper.getByUsername(username);
 
         //2、处理各种异常情况（用户名不存在、密码不对、账号被锁定）
+        // 账号不存在
         if (employee == null) {
-            //账号不存在
             throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
         }
-
-        //密码比对
+        // 密码比对错误
         String md5 = DigestUtils.md5DigestAsHex(password.getBytes());
         if (!md5.equals(employee.getPassword())) {
-            //密码错误
             throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
         }
-
+        // 账号被锁定
         if (Objects.equals(employee.getStatus(), StatusConstant.DISABLE)) {
-            //账号被锁定
             throw new AccountLockedException(MessageConstant.ACCOUNT_LOCKED);
         }
 
@@ -91,10 +88,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
         Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);
 
-        long total = page.getTotal();
-        List<Employee> result = page.getResult();
-
-        return new PageResult<>(total, result);
+        return new PageResult<>(page.getTotal(), page.getResult());
     }
 
     @Override
