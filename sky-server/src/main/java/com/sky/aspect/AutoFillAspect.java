@@ -23,40 +23,39 @@ import java.time.LocalDateTime;
 @Component
 @Slf4j
 public class AutoFillAspect {
-    // 切入点
+    /**
+     * 切入点
+     */
     @Pointcut("execution(* com.sky.mapper.*.*(..)) && @annotation(com.sky.annotation.AutoFill)")
     public void autoFillPointCut() {
-
     }
 
     /**
-     * 自定义前置通知
-     * @param{JoinPoint} joinPoint
+     * 前置处理方法
      */
     @Before("autoFillPointCut()")
     public void autoFill(JoinPoint joinPoint) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        log.info("开始进行公共字段自动填充");
+//        log.info("开始进行公共字段自动填充");
 
         // 获取操作类型
         MethodSignature signature = (MethodSignature) joinPoint.getSignature(); // 方法签名对象
         AutoFill autoFill = signature.getMethod().getAnnotation(AutoFill.class); // 获得方法上的注解对象
         OperationType operationType = autoFill.value(); // 获取数据库实际操作类型
-        
+
         // 获取拦截的方法参数 -- 实体对象
         Object[] args = joinPoint.getArgs(); // 获取所有参数
-        if (args.length == 0) {
+        if (args == null || args.length == 0) {
             return;
         }
-        
         Object entity = args[0]; // 获取第一个实体
-        
+
         // 准备赋值的数据
         LocalDateTime now = LocalDateTime.now();
         Long currentId = BaseContext.getCurrentId();
-        
+
         // 根据不同的操作类型，为对应的字段赋值
         if (operationType == OperationType.INSERT) {
-            // 为4个公共字段赋值
+            // 获取赋值方法
             Method setUpdateTime = entity.getClass().getDeclaredMethod(AutoFillConstant.SET_UPDATE_TIME, LocalDateTime.class);
             Method setUpdateUser = entity.getClass().getDeclaredMethod(AutoFillConstant.SET_UPDATE_USER, Long.class);
             Method setCreateTime = entity.getClass().getDeclaredMethod(AutoFillConstant.SET_CREATE_TIME, LocalDateTime.class);
@@ -74,6 +73,6 @@ public class AutoFillAspect {
             setUpdateTime.invoke(entity, now);
             setUpdateUser.invoke(entity, currentId);
         }
-        
+
     }
 }
