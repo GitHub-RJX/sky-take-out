@@ -19,7 +19,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/admin/category")
-@Api(tags = "分类相关接口")
+@Api(tags = "分类管理")
 @Slf4j
 public class CategoryController {
 
@@ -28,76 +28,82 @@ public class CategoryController {
 
     /**
      * 新增分类
-     * @param categoryDTO
-     * @return
+     *
+     * @param categoryDTO 分类新增请求数据
+     * @return 分类新增响应结果
      */
     @PostMapping
     @ApiOperation("新增分类")
-    public Result<String> save(@RequestBody CategoryDTO categoryDTO){
-        log.info("新增分类：{}", categoryDTO);
+    public Result<Void> save(@RequestBody CategoryDTO categoryDTO) {
+//        log.info("新增分类：{}", categoryDTO);
         categoryService.save(categoryDTO);
         return Result.success();
     }
 
     /**
-     * 分类分页查询
-     * @param categoryPageQueryDTO
-     * @return
+     * 分页查询分类数据
+     *
+     * @param categoryPageQueryDTO 分类分页查询请求数据
+     * @return 分类分页查询响应数据
      */
     @GetMapping("/page")
     @ApiOperation("分类分页查询")
-    public Result<PageResult> page(CategoryPageQueryDTO categoryPageQueryDTO){
-        log.info("分页查询：{}", categoryPageQueryDTO);
-        PageResult pageResult = categoryService.pageQuery(categoryPageQueryDTO);
+    public Result<PageResult<Category>> page(CategoryPageQueryDTO categoryPageQueryDTO) {
+//        log.info("分页查询：{}", categoryPageQueryDTO);
+        PageResult<Category> pageResult = categoryService.pageQuery(categoryPageQueryDTO);
         return Result.success(pageResult);
     }
 
     /**
      * 删除分类
-     * @param id
-     * @return
+     *
+     * @param id 分类ID
+     * @return 响应结果
      */
     @DeleteMapping
     @ApiOperation("删除分类")
-    public Result<String> deleteById(Long id){
-        log.info("删除分类：{}", id);
+    public Result<Void> deleteById(Long id) {
+//        log.info("删除分类：{}", id);
         categoryService.deleteById(id);
         return Result.success();
     }
 
     /**
      * 修改分类
-     * @param categoryDTO
-     * @return
+     *
+     * @param categoryDTO 分类修改请求数据
+     * @return 分类修改响应结果
      */
     @PutMapping
     @ApiOperation("修改分类")
-    public Result<String> update(@RequestBody CategoryDTO categoryDTO){
+    public Result<Void> update(@RequestBody CategoryDTO categoryDTO) {
         categoryService.update(categoryDTO);
         return Result.success();
     }
 
     /**
-     * 启用、禁用分类
-     * @param status
-     * @param id
-     * @return
+     * 启用/禁用分类
+     *
+     * @param status 分类状态
+     * @param id     分类ID
+     * @return 响应结果
      */
     @PostMapping("/status/{status}")
-    @ApiOperation("启用禁用分类")
-    public Result<String> startOrStop(@PathVariable("status") Integer status, Long id){
-        categoryService.startOrStop(status,id);
+    @ApiOperation("启用/禁用分类")
+    public Result<Void> startOrStop(@PathVariable("status") Integer status, @RequestParam Long id) {
+        categoryService.startOrStop(status, id);
         return Result.success();
     }
 
     /**
      * 根据类型查询分类
-     * @param type
-     * @return
+     *
+     * @param type 分类类型
+     * @return 分类查询响应数据
      */
     @GetMapping("/list")
     @ApiOperation("根据类型查询分类")
-    public Result<List<Category>> list(Integer type){
+    public Result<List<Category>> list(Integer type) {
         List<Category> list = categoryService.list(type);
         return Result.success(list);
     }
