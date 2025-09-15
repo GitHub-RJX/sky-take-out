@@ -22,7 +22,6 @@ import java.util.UUID;
 @Api(tags = "通用接口")
 @Slf4j
 public class CommonController {
-
     // 依赖注入
     @Autowired
     private AliOssUtil aliOssUtil;
@@ -30,7 +29,7 @@ public class CommonController {
     @PostMapping("upload")
     @ApiOperation("文件上传")
     public Result<String> upload(MultipartFile file) {
-        log.info("文件上传：{}", file);
+//        log.info("文件上传：{}", file);
 
         try {
             // 原始文件名
