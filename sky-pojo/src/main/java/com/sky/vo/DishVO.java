@@ -17,7 +17,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DishVO implements Serializable {
-
     private Long id;
     //菜品名称
     private String name;
@@ -37,6 +36,4 @@ public class DishVO implements Serializable {
     private String categoryName;
     //菜品关联的口味
     private List<DishFlavor> flavors = new ArrayList<>();
-
-    //private Integer copies;
 }
