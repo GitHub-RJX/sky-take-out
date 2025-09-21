@@ -1,5 +1,6 @@
 package com.sky.controller.admin;
 
+import com.sky.constant.RedisConstant;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
@@ -32,10 +33,19 @@ public class DishController {
     @ApiOperation("新增菜品")
     public Result<Void> save(@RequestBody DishDTO dishDTO) {
 //        log.info("新增菜品：{}", dishDTO);
+        // 新增菜品数据
         dishService.saveWithFlavor(dishDTO);
+        // 清除Redis缓存中菜品所属分类下的菜品数据
+        redisTemplate.delete(RedisConstant.DISH_CATEGORY_ + dishDTO.getCategoryId());
         return Result.success();
     }
 
+    /**
+     * 菜品分页查询
+     *
+     * @param dishPageQueryDTO 分页查询请求数据
+     * @return 分页查询响应数据
+     */
     @GetMapping("/page")
     @ApiOperation("菜品分页查询")
     public Result<PageResult<DishVO>> page(DishPageQueryDTO dishPageQueryDTO) {
@@ -44,7 +54,7 @@ public class DishController {
     }
 
     /**
-     * 启用或停用菜品
+     * 启售/停售菜品
      *
      * @param status 菜品状态
      * @param id     菜品ID
@@ -52,10 +62,14 @@ public class DishController {
     @PostMapping("/status/{status}")
     @ApiOperation("启用/停用菜品")
     public Result<Void> startOrStop(@PathVariable Integer status, Long id) {
-        // 1. 启用 0. 停用
 //        log.info("启用或停用菜品：{}", id);
+        // 启售/停售菜品
         dishService.startOrStop(status, id);
-        clearRedis("dish_*");
+        // 清除Redis缓存中菜品所属分类下的菜品数据
+        Set<String> categoryKeys = redisTemplate.keys(RedisConstant.DISH_CATEGORY_ + "*");
+        if (!CollectionUtils.isEmpty(categoryKeys)) {
+            redisTemplate.delete(categoryKeys);
+        }
         return Result.success();
     }
 
@@ -67,11 +81,12 @@ public class DishController {
     @DeleteMapping
     @ApiOperation("删除菜品")
     public Result<Void> delete(@RequestParam Long[] ids) {
+        // 批量删除菜品
         dishService.deleteBatch(ids);
-        // 将所有菜品缓存数据清理，所有以dish_的key
-        Set<String> keys = redisTemplate.keys("dish_*");
-        if (!CollectionUtils.isEmpty(keys)) {
-            redisTemplate.delete(keys);
+        // 清除Redis缓存中菜品所属分类下的菜品数据
+        Set<String> categoryKeys = redisTemplate.keys(RedisConstant.DISH_CATEGORY_ + "*");
+        if (!CollectionUtils.isEmpty(categoryKeys)) {
+            redisTemplate.delete(categoryKeys);
         }
         return Result.success();
     }
@@ -79,7 +94,7 @@ public class DishController {
     @GetMapping("/{id}")
     @ApiOperation("根据ID查询指定菜品")
     public Result<DishVO> getByIdWithFlavor(@PathVariable Long id) {
-        log.info("根据ID查询指定菜品：{}", id);
+//        log.info("根据ID查询指定菜品：{}", id);
         return Result.success(dishService.getByIdWithFlavor(id));
     }
 
@@ -93,27 +108,25 @@ public class DishController {
     @ApiOperation("更新菜品信息")
     public Result<Void> update(@RequestBody DishDTO dishDTO) {
 //        log.info("更新菜品信息：{}", dishDTO);
+        // 更新菜品信息
         dishService.updateWithFlavor(dishDTO);
-        // 更新缓存数据
-        String key = "dish_" + dishDTO.getCategoryId();
-        redisTemplate.delete(key);
+        // 清除Redis缓存中菜品所属分类下的菜品数据
+        Set<String> categoryKeys = redisTemplate.keys(RedisConstant.DISH_CATEGORY_ + "*");
+        if (!CollectionUtils.isEmpty(categoryKeys)) {
+            redisTemplate.delete(categoryKeys);
+        }
         return Result.success();
     }
 
     /**
      * 根据分类id查询菜品
      *
-     * @param categoryId
-     * @return
+     * @param categoryId 分类ID
+     * @return 菜品列表
      */
     @GetMapping("/list")
     public Result<List<Dish>> list(Long categoryId) {
         List<Dish> dishList = dishService.list(categoryId);
         return Result.success(dishList);
-    }
-
-    private void clearRedis(String keys) {
-        Set<String> cacheKeys = redisTemplate.keys(keys);
-        redisTemplate.delete(cacheKeys);
     }
 }

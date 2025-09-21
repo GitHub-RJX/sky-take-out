@@ -13,6 +13,7 @@ import com.sky.exception.StatusSwitchException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
+import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -35,6 +37,8 @@ public class DishServiceImpl implements DishService {
     private DishFlavorMapper dishFlavorMapper;
     @Autowired
     private SetmealDishMapper setmealDishMapper;
+    @Autowired
+    private SetmealMapper setmealMapper;
 
     /**
      * 新增菜品以及保存口味
@@ -79,14 +83,15 @@ public class DishServiceImpl implements DishService {
     @Transactional
     @Override
     public void deleteBatch(Long[] ids) {
-        // 判断菜品是否处于起售中
+        // 判断菜品是否处于启售中
         if (Arrays.stream(ids)
                 .map(dishMapper::getById)
                 .anyMatch(dish -> StatusConstant.ENABLE.equals(dish.getStatus()))) {
             throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
         }
         // 判断菜品是否已被套餐关联
-        if (!CollectionUtils.isEmpty(setmealDishMapper.getSetmealIdsByDishIds(Arrays.asList(ids)))) {
+        List<Long> setmealIds = setmealDishMapper.getSetmealIdsByDishIds(Arrays.asList(ids));
+        if (!CollectionUtils.isEmpty(setmealIds)) {
             throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
         }
         // 删除菜品数据和菜品关联的口味数据
@@ -132,7 +137,7 @@ public class DishServiceImpl implements DishService {
     }
 
     /**
-     * 启用或禁用菜品
+     * 启售/停售菜品
      *
      * @param status 菜品状态
      * @param id     菜品ID
@@ -142,6 +147,12 @@ public class DishServiceImpl implements DishService {
         // 检查状态值是否非法
         if (!StatusConstant.ENABLE.equals(status) && !StatusConstant.DISABLE.equals(status)) {
             throw new StatusSwitchException(MessageConstant.STATUS_IS_INVALID);
+        }
+        // 检查当前菜品是否关联正在启售中的套餐
+        List<Long> setmealIds = setmealDishMapper.getSetmealIdsByDishIds(Collections.singletonList(id));
+        Integer enableCount = setmealMapper.checkIfExistEnable(setmealIds);
+        if (enableCount > 0) {
+            throw new StatusSwitchException(MessageConstant.DISH_BE_RELATED_BY_ENABLE_SETMEAL);
         }
         // 修改菜品售卖状态
         dishMapper.update(Dish.builder().id(id).status(status).build());

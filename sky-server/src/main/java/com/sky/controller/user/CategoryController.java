@@ -22,8 +22,9 @@ public class CategoryController {
 
     /**
      * 查询分类
-     * @param type
-     * @return
+     *
+     * @param type 分类类型
+     * @return 分类查询响应数据
      */
     @GetMapping("/list")
     @ApiOperation("查询分类")
