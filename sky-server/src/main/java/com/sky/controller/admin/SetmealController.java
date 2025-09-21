@@ -1,5 +1,6 @@
 package com.sky.controller.admin;
 
+import com.sky.constant.RedisConstant;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.result.PageResult;
@@ -11,18 +12,22 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/admin/setmeal")
 @Api(tags = "套餐相关接口")
 @Slf4j
 public class SetmealController {
-
     @Autowired
     private SetmealService setmealService;
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     /**
      * 新增套餐
@@ -83,15 +88,20 @@ public class SetmealController {
     /**
      * 修改套餐
      *
-     * @param setmealDTO
-     * @return
+     * @param setmealDTO 套餐修改请求数据
      */
     @PutMapping
     @ApiOperation("修改套餐")
     @CacheEvict(cacheNames = "setmealCache", allEntries = true)
-    public Result<String> update(@RequestBody SetmealDTO setmealDTO) {
-        log.info("修改套餐，请求参数：{}", setmealDTO);
+    public Result<Void> update(@RequestBody SetmealDTO setmealDTO) {
+//        log.info("修改套餐，请求参数：{}", setmealDTO);
+        // 修改套餐
         setmealService.update(setmealDTO);
+        // 清除Redis缓存中菜品所属分类下的菜品数据
+        Set<String> categoryKeys = redisTemplate.keys(RedisConstant.SETMEAL_CATEGORY_ + "*");
+        if (!CollectionUtils.isEmpty(categoryKeys)) {
+            redisTemplate.delete(categoryKeys);
+        }
         return Result.success();
     }
 

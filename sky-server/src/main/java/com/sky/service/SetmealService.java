@@ -44,12 +44,12 @@ public interface SetmealService {
     /**
      * 修改套餐
      *
-     * @param setmealDTO
+     * @param setmealDTO 套餐修改请求数据
      */
     void update(SetmealDTO setmealDTO);
 
     /**
-     * 套餐起售、停售
+     * 套餐启售、停售
      *
      * @param status
      * @param id
@@ -58,15 +58,17 @@ public interface SetmealService {
 
     /**
      * 条件查询
-     * @param setmeal
-     * @return
+     *
+     * @param setmeal 条件查询请求数据
+     * @return 条件查询响应数据
      */
     List<Setmeal> list(Setmeal setmeal);
 
     /**
      * 根据id查询菜品选项
-     * @param id
-     * @return
+     *
+     * @param id 套餐ID
+     * @return 菜品查询响应数据
      */
     List<DishItemVO> getDishItemById(Long id);
 

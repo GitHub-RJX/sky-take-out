@@ -26,17 +26,17 @@ public class SetmealController {
     /**
      * 条件查询
      *
-     * @param categoryId
-     * @return
+     * @param categoryId 分类ID
+     * @return 条件查询响应结果
      */
     @GetMapping("/list")
     @Cacheable(cacheNames = "setmealCache", key = "#categoryId")
     @ApiOperation("根据分类id查询套餐")
     public Result<List<Setmeal>> list(Long categoryId) {
-        Setmeal setmeal = new Setmeal();
-        setmeal.setCategoryId(categoryId);
-        setmeal.setStatus(StatusConstant.ENABLE);
-
+        Setmeal setmeal = Setmeal.builder()
+                .categoryId(categoryId)
+                .status(StatusConstant.ENABLE)
+                .build();
         List<Setmeal> list = setmealService.list(setmeal);
         return Result.success(list);
     }
@@ -44,12 +44,12 @@ public class SetmealController {
     /**
      * 根据套餐id查询包含的菜品列表
      *
-     * @param id
-     * @return
+     * @param id 套餐ID
+     * @return 菜品查询响应数据
      */
     @GetMapping("/dish/{id}")
     @ApiOperation("根据套餐id查询包含的菜品列表")
-    public Result<List<DishItemVO>> dishList(@PathVariable("id") Long id) {
+    public Result<List<DishItemVO>> dishList(@PathVariable Long id) {
         List<DishItemVO> list = setmealService.getDishItemById(id);
         return Result.success(list);
     }

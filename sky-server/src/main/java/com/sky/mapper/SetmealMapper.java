@@ -30,7 +30,7 @@ public interface SetmealMapper {
     /**
      * 根据id修改套餐
      *
-     * @param setmeal
+     * @param setmeal 套餐数据
      */
     @AutoFill(OperationType.UPDATE)
     void update(Setmeal setmeal);
@@ -45,6 +45,7 @@ public interface SetmealMapper {
 
     /**
      * 分页查询
+     *
      * @param setmealPageQueryDTO
      * @return
      */
@@ -52,6 +53,7 @@ public interface SetmealMapper {
 
     /**
      * 根据id查询套餐
+     *
      * @param id
      * @return
      */
@@ -60,20 +62,22 @@ public interface SetmealMapper {
 
     /**
      * 根据id删除套餐
+     *
      * @param setmealId
      */
     @Delete("delete from setmeal where id = #{id}")
     void deleteById(Long setmealId);
 
     /**
-     * 根据id查询套餐和套餐菜品关系
-     * @param id
-     * @return
+     * 根据id查询套餐及关联的菜品
+     *
+     * @param id 套餐ID
      */
     SetmealVO getByIdWithDish(Long id);
 
     /**
      * 动态条件查询套餐
+     *
      * @param setmeal
      * @return
      */
@@ -81,6 +85,7 @@ public interface SetmealMapper {
 
     /**
      * 根据套餐id查询菜品选项
+     *
      * @param setmealId
      * @return
      */
@@ -91,11 +96,25 @@ public interface SetmealMapper {
 
     /**
      * 根据条件统计套餐数量
+     *
      * @param map
      * @return
      */
     Integer countByMap(Map map);
 
+    /**
+     * 启售/停售套餐
+     *
+     * @param status 套餐状态
+     * @param id     套餐ID
+     */
     @Update("update setmeal set status = #{status} where id = #{id}")
     void startOrStop(Integer status, Long id);
+
+    /**
+     * 检查是否存在启售中的套餐
+     *
+     * @param setmealIds 套餐ID列表
+     */
+    Integer checkIfExistEnable(List<Long> setmealIds);
 }

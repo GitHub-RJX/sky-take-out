@@ -37,20 +37,20 @@ public class SetmealServiceImpl implements SetmealService {
     /**
      * 新增套餐，同时需要保存套餐和菜品的关联关系
      *
-     * @param setmealDTO
+     * @param setmealDTO 套餐新增请求数据
      */
     @Override
     public void saveWithDish(SetmealDTO setmealDTO) {
+        // 新增套餐
         Setmeal setmeal = new Setmeal();
         BeanUtils.copyProperties(setmealDTO, setmeal);
         setmealMapper.insert(setmeal);
+        // 保存套餐与菜品的关联关系
         List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
-        setmealDishes.forEach(setmealDish -> {
-            setmealDish.setSetmealId(setmeal.getId());
-        });
+        setmealDishes.forEach(setmealDish -> setmealDish.setSetmealId(setmeal.getId()));
         setmealDishMapper.insertBatch(setmealDishes);
-        log.info("套餐和菜品的关联关系保存成功");
-        log.info("套餐保存成功");
+//        log.info("套餐和菜品的关联关系保存成功");
+//        log.info("套餐保存成功");
     }
 
     /**
@@ -80,28 +80,35 @@ public class SetmealServiceImpl implements SetmealService {
     /**
      * 根据id查询套餐和关联的菜品数据
      *
-     * @param id
-     * @return
+     * @param id 套餐ID
      */
     @Override
     public SetmealVO getByIdWithDish(Long id) {
-        return null;
+        SetmealVO setmealVO = setmealMapper.getByIdWithDish(id);
+        return setmealVO == null ? new SetmealVO() : setmealVO;
     }
 
     /**
      * 修改套餐
      *
-     * @param setmealDTO
+     * @param setmealDTO 套餐修改请求数据
      */
     @Override
     public void update(SetmealDTO setmealDTO) {
+        // 修改套餐
         Setmeal setmeal = new Setmeal();
         BeanUtils.copyProperties(setmealDTO, setmeal);
         setmealMapper.update(setmeal);
+        // 删除套餐原本关联菜品的关联关系
+        setmealDishMapper.deleteBySetmealId(setmeal.getId());
+        // 保存套餐与菜品的关联关系
+        List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
+        setmealDishes.forEach(setmealDish -> setmealDish.setSetmealId(setmeal.getId()));
+        setmealDishMapper.insertBatch(setmealDishes);
     }
 
     /**
-     * 套餐起售、停售
+     * 套餐启售、停售
      *
      * @param status
      * @param id
@@ -113,16 +120,17 @@ public class SetmealServiceImpl implements SetmealService {
 
     /**
      * 条件查询
-     * @param setmeal
-     * @return
+     *
+     * @param setmeal 条件查询请求数据
+     * @return 条件查询响应数据
      */
     public List<Setmeal> list(Setmeal setmeal) {
-        List<Setmeal> list = setmealMapper.list(setmeal);
-        return list;
+        return setmealMapper.list(setmeal);
     }
 
     /**
      * 根据id查询菜品选项
+     *
      * @param id
      * @return
      */

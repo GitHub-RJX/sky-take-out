@@ -74,20 +74,18 @@
         order by s.create_time desc
     </select>
 
-    <select id="getByIdWithDish" parameterType="long" resultMap="setmealAndDishMap">
-        select a.*,
-               b.id    sd_id,
-               b.setmeal_id,
-               b.dish_id,
-               b.name  sd_name,
-               b.price sd_price,
-               b.copies
-        from setmeal a
-                 left join
-             setmeal_dish b
-             on
-                 a.id = b.setmeal_id
-        where a.id = #{id}
+    <select id="getByIdWithDish" parameterType="java.lang.Long" resultMap="setmealAndDishMap">
+        SELECT s.*,
+               sd.id    sd_id,
+               sd.setmeal_id,
+               sd.dish_id,
+               sd.name  sd_name,
+               sd.price sd_price,
+               sd.copies
+        FROM setmeal s
+                 LEFT JOIN setmeal_dish sd
+                           ON s.id = sd.setmeal_id
+        WHERE s.id = #{id}
     </select>
 
     <select id="list" parameterType="Setmeal" resultType="Setmeal">
@@ -116,4 +114,24 @@
             </if>
         </where>
     </select>
+
+    <select id="checkIfExistEnable" resultType="java.lang.Integer">
+        <choose>
+            <!-- 集合不为空时执行正常 SQL -->
+            <when test="setmealIds != null and setmealIds.size > 0">
+                SELECT count(*)
+                FROM setmeal
+                WHERE status = 1
+                AND id IN
+                <foreach collection="setmealIds" item="setmealId" separator="," open="(" close=")">
+                    #{setmealId}
+                </foreach>
+            </when>
+            <!-- 集合为空时返回 0 -->
+            <otherwise>
+                SELECT 0
+            </otherwise>
+        </choose>
+    </select>
+
 </mapper>
