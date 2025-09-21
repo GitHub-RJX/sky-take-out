@@ -21,15 +21,15 @@ public interface SetmealService {
     /**
      * 分页查询
      *
-     * @param setmealPageQueryDTO
-     * @return
+     * @param setmealPageQueryDTO 分页查询请求数据
+     * @return 分页查询响应数据
      */
-    PageResult pageQuery(SetmealPageQueryDTO setmealPageQueryDTO);
+    PageResult<SetmealVO> pageQuery(SetmealPageQueryDTO setmealPageQueryDTO);
 
     /**
      * 批量删除套餐
      *
-     * @param ids
+     * @param ids 套餐ID列表
      */
     void deleteBatch(List<Long> ids);
 

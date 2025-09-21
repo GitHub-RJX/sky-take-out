@@ -46,8 +46,8 @@ public interface SetmealMapper {
     /**
      * 分页查询
      *
-     * @param setmealPageQueryDTO
-     * @return
+     * @param setmealPageQueryDTO 分页查询请求数据
+     * @return 分页查询响应数据
      */
     Page<SetmealVO> pageQuery(SetmealPageQueryDTO setmealPageQueryDTO);
 
@@ -117,4 +117,11 @@ public interface SetmealMapper {
      * @param setmealIds 套餐ID列表
      */
     Integer checkIfExistEnable(List<Long> setmealIds);
+
+    /**
+     * 批量删除套餐
+     *
+     * @param ids 套餐ID列表
+     */
+    void deleteByIds(List<Long> ids);
 }

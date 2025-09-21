@@ -25,6 +25,7 @@ public class MessageConstant {
     public static final String ORDER_STATUS_ERROR = "订单状态错误";
     public static final String ORDER_NOT_FOUND = "订单不存在";
     public static final String STATUS_IS_INVALID = "状态值不合法";
-    public static final String DISH_BE_RELATED_BY_ENABLE_SETMEAL = "当前菜品关联了启售中的套餐，请先停售对应套餐";
+    public static final String DISH_BE_RELATED_BY_ENABLE_SETMEAL = "当前菜品关联了启售中的套餐，请先停售对应套餐！";
+    public static final String REQUEST_PARAM_IS_NULL_OR_EMPTY = "您的请求参数为空，请检查后再次操作！";
 
 }
