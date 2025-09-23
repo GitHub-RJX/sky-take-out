@@ -8,14 +8,16 @@ import java.util.List;
 public interface ShoppingCartService {
 
     /**
-     * 添加购物车
-     * @param shoppingCartDTO
+     * 添加购物车商品
+     *
+     * @param shoppingCartDTO 购物车添加请求数据
      */
     void addShoppingCart(ShoppingCartDTO shoppingCartDTO);
 
     /**
      * 查看购物车
-     * @return
+     *
+     * @return 购物车数据列表
      */
     List<ShoppingCart> showShoppingCart();
 
@@ -25,8 +27,9 @@ public interface ShoppingCartService {
     void cleanShoppingCart();
 
     /**
-     * 删除购物车中一个商品
-     * @param shoppingCartDTO
+     * 删除购物车商品
+     *
+     * @param shoppingCartDTO 购物车删除请求数据
      */
     void subShoppingCart(ShoppingCartDTO shoppingCartDTO);
 }

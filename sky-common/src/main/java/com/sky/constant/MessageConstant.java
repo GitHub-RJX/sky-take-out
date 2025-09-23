@@ -27,5 +27,6 @@ public class MessageConstant {
     public static final String STATUS_IS_INVALID = "状态值不合法";
     public static final String DISH_BE_RELATED_BY_ENABLE_SETMEAL = "当前菜品关联了启售中的套餐，请先停售对应套餐！";
     public static final String REQUEST_PARAM_IS_NULL_OR_EMPTY = "您的请求参数为空，请检查后再次操作！";
+    public static final String SHOPPING_CART_IS_NOT_EXIST = "您当前删除的商品在购物车中并不存在，请重新选择需要删除的商品！";
 
 }
