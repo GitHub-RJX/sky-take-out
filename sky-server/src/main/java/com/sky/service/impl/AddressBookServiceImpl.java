@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import com.sky.constant.BooleanConstant;
 import com.sky.context.BaseContext;
 import com.sky.entity.AddressBook;
 import com.sky.mapper.AddressBookMapper;
@@ -20,8 +21,8 @@ public class AddressBookServiceImpl implements AddressBookService {
     /**
      * 条件查询
      *
-     * @param addressBook
-     * @return
+     * @param addressBook 地址信息查询请求数据
+     * @return 地址信息列表
      */
     public List<AddressBook> list(AddressBook addressBook) {
         return addressBookMapper.list(addressBook);
@@ -30,29 +31,28 @@ public class AddressBookServiceImpl implements AddressBookService {
     /**
      * 新增地址
      *
-     * @param addressBook
+     * @param addressBook 地址信息新增请求数据
      */
     public void save(AddressBook addressBook) {
         addressBook.setUserId(BaseContext.getCurrentId());
-        addressBook.setIsDefault(0);
+        addressBook.setIsDefault(BooleanConstant.FALSE);
         addressBookMapper.insert(addressBook);
     }
 
     /**
      * 根据id查询
      *
-     * @param id
-     * @return
+     * @param id 地址ID
+     * @return 地址信息
      */
     public AddressBook getById(Long id) {
-        AddressBook addressBook = addressBookMapper.getById(id);
-        return addressBook;
+        return addressBookMapper.getById(id);
     }
 
     /**
      * 根据id修改地址
      *
-     * @param addressBook
+     * @param addressBook 地址信息修改请求数据
      */
     public void update(AddressBook addressBook) {
         addressBookMapper.update(addressBook);
@@ -61,24 +61,23 @@ public class AddressBookServiceImpl implements AddressBookService {
     /**
      * 设置默认地址
      *
-     * @param addressBook
+     * @param addressBook 默认地址设置请求数据
      */
     @Transactional
     public void setDefault(AddressBook addressBook) {
-        //1、将当前用户的所有地址修改为非默认地址 update address_book set is_default = ? where user_id = ?
-        addressBook.setIsDefault(0);
+        //先将当前用户的所有地址修改为非默认地址
+        addressBook.setIsDefault(BooleanConstant.FALSE);
         addressBook.setUserId(BaseContext.getCurrentId());
         addressBookMapper.updateIsDefaultByUserId(addressBook);
-
-        //2、将当前地址改为默认地址 update address_book set is_default = ? where id = ?
-        addressBook.setIsDefault(1);
+        //再将当前地址改为默认地址
+        addressBook.setIsDefault(BooleanConstant.TRUE);
         addressBookMapper.update(addressBook);
     }
 
     /**
      * 根据id删除地址
      *
-     * @param id
+     * @param id 地址ID
      */
     public void deleteById(Long id) {
         addressBookMapper.deleteById(id);

@@ -1,5 +1,7 @@
 package com.sky.controller.user;
 
+import com.sky.constant.BooleanConstant;
+import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
 import com.sky.entity.AddressBook;
 import com.sky.result.Result;
@@ -7,6 +9,7 @@ import com.sky.service.AddressBookService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,14 +18,13 @@ import java.util.List;
 @RequestMapping("/user/addressBook")
 @Api(tags = "C端地址簿接口")
 public class AddressBookController {
-
     @Autowired
     private AddressBookService addressBookService;
 
     /**
      * 查询当前登录用户的所有地址信息
      *
-     * @return
+     * @return 地址信息列表
      */
     @GetMapping("/list")
     @ApiOperation("查询当前登录用户的所有地址信息")
@@ -36,12 +38,11 @@ public class AddressBookController {
     /**
      * 新增地址
      *
-     * @param addressBook
-     * @return
+     * @param addressBook 地址信息新增请求数据
      */
     @PostMapping
     @ApiOperation("新增地址")
-    public Result save(@RequestBody AddressBook addressBook) {
+    public Result<Void> save(@RequestBody AddressBook addressBook) {
         addressBookService.save(addressBook);
         return Result.success();
     }
@@ -56,12 +57,11 @@ public class AddressBookController {
     /**
      * 根据id修改地址
      *
-     * @param addressBook
-     * @return
+     * @param addressBook 地址信息修改请求数据
      */
     @PutMapping
     @ApiOperation("根据id修改地址")
-    public Result update(@RequestBody AddressBook addressBook) {
+    public Result<Void> update(@RequestBody AddressBook addressBook) {
         addressBookService.update(addressBook);
         return Result.success();
     }
@@ -69,12 +69,11 @@ public class AddressBookController {
     /**
      * 设置默认地址
      *
-     * @param addressBook
-     * @return
+     * @param addressBook 默认地址设置请求数据
      */
     @PutMapping("/default")
     @ApiOperation("设置默认地址")
-    public Result setDefault(@RequestBody AddressBook addressBook) {
+    public Result<Void> setDefault(@RequestBody AddressBook addressBook) {
         addressBookService.setDefault(addressBook);
         return Result.success();
     }
@@ -82,12 +81,11 @@ public class AddressBookController {
     /**
      * 根据id删除地址
      *
-     * @param id
-     * @return
+     * @param id 地址ID
      */
     @DeleteMapping
     @ApiOperation("根据id删除地址")
-    public Result deleteById(Long id) {
+    public Result<Void> deleteById(Long id) {
         addressBookService.deleteById(id);
         return Result.success();
     }
@@ -98,17 +96,13 @@ public class AddressBookController {
     @GetMapping("default")
     @ApiOperation("查询默认地址")
     public Result<AddressBook> getDefault() {
-        //SQL:select * from address_book where user_id = ? and is_default = 1
-        AddressBook addressBook = new AddressBook();
-        addressBook.setIsDefault(1);
-        addressBook.setUserId(BaseContext.getCurrentId());
-        List<AddressBook> list = addressBookService.list(addressBook);
-
-        if (list != null && list.size() == 1) {
-            return Result.success(list.get(0));
-        }
-
-        return Result.error("没有查询到默认地址");
+        AddressBook addressBook = AddressBook.builder()
+                .userId(BaseContext.getCurrentId())
+                .isDefault(BooleanConstant.TRUE)
+                .build();
+        List<AddressBook> addressBookList = addressBookService.list(addressBook);
+        return CollectionUtils.isEmpty(addressBookList) ?
+                Result.success(addressBookList.get(0)) : Result.error(MessageConstant.NOT_FOUND_DEFAULT_ADDRESS);
     }
 
 }
