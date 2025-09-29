@@ -10,14 +10,16 @@ import java.util.List;
 public interface OrderDetailMapper {
     /**
      * 批量插入订单明细数据
-     * @param orderDetailList
+     *
+     * @param orderDetailList 订单明细列表数据
      */
     void insertBatch(List<OrderDetail> orderDetailList);
 
     /**
      * 根据订单id查询订单明细
-     * @param orderId
-     * @return
+     *
+     * @param orderId 订单ID
+     * @return 订单明细列表数据
      */
     @Select("select * from order_detail where order_id = #{orderId}")
     List<OrderDetail> getByOrderId(Long orderId);

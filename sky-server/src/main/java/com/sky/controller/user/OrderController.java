@@ -18,14 +18,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/user/order")
 @Slf4j
 public class OrderController {
-
     @Autowired
     private OrderService orderService;
 
     @PostMapping("/submit")
     @ApiOperation("用户下单")
-    public Result<OrderSubmitVO> submit(@RequestBody OrdersSubmitDTO dto) {
-        OrderSubmitVO orderSubmitVO = orderService.submitOrder(dto);
+    public Result<OrderSubmitVO> submit(@RequestBody OrdersSubmitDTO ordersSubmitDTO) {
+        OrderSubmitVO orderSubmitVO = orderService.submitOrder(ordersSubmitDTO);
         return Result.success(orderSubmitVO);
     }
 
@@ -47,6 +46,7 @@ public class OrderController {
 
     /**
      * 订单支付
+     *
      * @param id
      * @return
      */

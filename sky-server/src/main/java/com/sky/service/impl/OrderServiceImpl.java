@@ -70,37 +70,30 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private WeChatPayUtil weChatPayUtil;
 
-    // @Autowired
-    // private UserMapper userMapper;
-
     @Autowired
     private WebSocketServer webSocketServer;
 
     /**
      * 用户下单
      *
-     * @param ordersSubmitDTO
-     * @return
+     * @param ordersSubmitDTO 用户下单请求数据
+     * @return 用户下单响应数据
      */
     @Override
     @Transactional
     public OrderSubmitVO submitOrder(OrdersSubmitDTO ordersSubmitDTO) {
-        // 业务异常处理，地址为空、购物车为空
+        // 检查地址是否为空
         AddressBook addressBook = addressBookMapper.getById(ordersSubmitDTO.getAddressBookId());
         if (addressBook == null) {
-            // 抛出异常
             throw new AddressBookBusinessException(MessageConstant.ADDRESS_BOOK_IS_NULL);
         }
-        Long userId = BaseContext.getCurrentId();
-        ShoppingCart shoppingCart = new ShoppingCart();
-        shoppingCart.setUserId(userId);
-        List<ShoppingCart> cartList = shoppingCartMapper.list(shoppingCart);
-        if (cartList == null || cartList.isEmpty()) {
-            // 抛出异常
+        // 检查购物车是否为空
+        List<ShoppingCart> shoppingCartList = shoppingCartMapper.list(
+                ShoppingCart.builder().userId(BaseContext.getCurrentId()).build());
+        if (CollectionUtils.isEmpty(shoppingCartList)) {
             throw new ShoppingCartBusinessException(MessageConstant.SHOPPING_CART_IS_NULL);
         }
-
-        // 订单表插入一条数据
+        // 向订单表插入一条数据
         Orders orders = new Orders();
         BeanUtils.copyProperties(ordersSubmitDTO, orders);
         orders.setOrderTime(LocalDateTime.now());
@@ -110,32 +103,27 @@ public class OrderServiceImpl implements OrderService {
         orders.setAddress(addressBook.getDetail());
         orders.setPhone(addressBook.getPhone());
         orders.setConsignee(addressBook.getConsignee());
-        orders.setUserId(userId);
-
+        orders.setUserId(BaseContext.getCurrentId());
         orderMapper.insert(orders);
-
-        // 订单详情表插入多条数据
-        List<OrderDetail> orderDetailList = new ArrayList<>();
-        cartList.forEach(cart -> {
-            OrderDetail orderDetail = new OrderDetail();
-            BeanUtils.copyProperties(cart, orderDetail);
-            orderDetail.setOrderId(orders.getId());
-            orderDetailList.add(orderDetail);
-        });
+        // 向订单详情表插入多条数据
+        List<OrderDetail> orderDetailList = shoppingCartList.stream()
+                .map(shoppingCart -> {
+                    OrderDetail orderDetail = new OrderDetail();
+                    BeanUtils.copyProperties(shoppingCart, orderDetail);
+                    orderDetail.setOrderId(orders.getId());
+                    return orderDetail;
+                })
+                .toList();
         orderDetailMapper.insertBatch(orderDetailList);
-
-        // 清空购物车
-        shoppingCartMapper.deleteByUserId(userId);
-
-        // 返回 VO
-        OrderSubmitVO orderSubmitVO = OrderSubmitVO.builder()
+        // 清空购物车数据
+        shoppingCartMapper.deleteByUserId(BaseContext.getCurrentId());
+        // 返回订单响应数据
+        return OrderSubmitVO.builder()
                 .id(orders.getId())
                 .orderTime(orders.getOrderTime())
                 .orderNumber(orders.getNumber())
                 .orderAmount(orders.getAmount())
                 .build();
-
-        return orderSubmitVO;
     }
 
     /**
