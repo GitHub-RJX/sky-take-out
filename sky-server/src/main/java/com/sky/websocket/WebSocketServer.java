@@ -18,9 +18,7 @@ import java.util.Map;
 @Component
 @ServerEndpoint("/ws/{sid}")
 public class WebSocketServer {
-
-    //存放会话对象
-    private static Map<String, Session> sessionMap = new HashMap();
+    private static final Map<String, Session> sessionMap = new HashMap<>();
 
     /**
      * 连接建立成功调用的方法
