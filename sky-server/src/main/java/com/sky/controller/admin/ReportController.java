@@ -23,54 +23,53 @@ import javax.servlet.http.HttpServletResponse;
 @RequestMapping("/admin/report")
 @Slf4j
 public class ReportController {
-
     @Autowired
     private ReportService reportService;
 
+    /**
+     * 营业额数据统计
+     *
+     * @param begin 统计开始时间
+     * @param end   统计结束时间
+     */
     @GetMapping("/turnoverStatistics")
     public Result<TurnoverReportVO> turnoverStatistics(
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
-        log.info("营业额统计：begin={}, end={}", begin, end);
         return Result.success(reportService.getTurnoverReport(begin, end));
     }
 
     /**
      * 用户数据统计
      *
-     * @param begin
-     * @param end
-     * @return
+     * @param begin 统计开始时间
+     * @param end   统计结束时间
      */
     @GetMapping("/userStatistics")
     public Result<UserReportVO> userStatistics(
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
-
         return Result.success(reportService.getUserStatistics(begin, end));
     }
 
     /**
      * 订单数据统计
      *
-     * @param begin
-     * @param end
-     * @return
+     * @param begin 统计开始时间
+     * @param end   统计结束时间
      */
     @GetMapping("/ordersStatistics")
     public Result<OrderReportVO> orderStatistics(
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
-
         return Result.success(reportService.getOrderStatistics(begin, end));
     }
 
     /**
-     * 销量排名统计
+     * 销量排名Top10统计
      *
-     * @param begin
-     * @param end
-     * @return
+     * @param begin 统计开始时间
+     * @param end   统计结束时间
      */
     @GetMapping("/top10")
     public Result<SalesTop10ReportVO> top10(
@@ -82,10 +81,10 @@ public class ReportController {
     /**
      * 导出运营报表
      *
-     * @param resp
+     * @param response 报表导出响应
      */
     @GetMapping("/export")
-    public void exportExcel(HttpServletResponse resp) {
-        reportService.exportExcel(resp);
+    public void exportExcel(HttpServletResponse response) {
+        reportService.exportExcel(response);
     }
 }

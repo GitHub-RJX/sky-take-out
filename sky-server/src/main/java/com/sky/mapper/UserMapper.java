@@ -11,6 +11,7 @@ public interface UserMapper {
 
     /**
      * 根据openid查询用户
+     *
      * @param openid
      * @return
      */
@@ -19,6 +20,7 @@ public interface UserMapper {
 
     /**
      * 插入数据
+     *
      * @param user
      */
     void insert(User user);
@@ -28,8 +30,8 @@ public interface UserMapper {
 
     /**
      * 根据动态条件统计用户数量
-     * @param map
-     * @return
+     *
+     * @param conditionMap 动态条件集合
      */
-    Integer countByMap(Map map);
+    Integer countByMap(Map<String, Object> conditionMap);
 }

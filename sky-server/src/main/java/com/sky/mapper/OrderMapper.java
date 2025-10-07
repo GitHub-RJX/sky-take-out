@@ -73,32 +73,29 @@ public interface OrderMapper {
     /**
      * 根据动态条件统计营业额数据
      *
-     * @param map
-     * @return
+     * @param conditionMap 动态条件集合
      */
-    Double sumByMap(Map map);
+    Double sumByMap(Map<String, Object> conditionMap);
 
     /**
      * 根据动态条件统计订单数量
      *
-     * @param map
-     * @return
+     * @param conditionMap 动态条件集合
      */
-    Integer countByMap(Map map);
+    Integer countByMap(Map<String, Object> conditionMap);
 
     /**
      * 统计指定时间区间内的销量排名前10
      *
-     * @param begin
-     * @param end
-     * @return
+     * @param begin 统计开始时间
+     * @param end   统计结束时间
      */
     List<GoodsSalesDTO> getSalesTop10(LocalDateTime begin, LocalDateTime end);
 
     /**
      * 根据订单号查询订单
      *
-     * @param orderNumber
+     * @param orderNumber 订单编号
      */
     @Select("select * from orders where number = #{orderNumber}")
     Orders getByNumber(String orderNumber);
