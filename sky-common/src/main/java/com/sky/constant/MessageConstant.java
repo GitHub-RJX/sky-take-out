@@ -30,6 +30,6 @@ public class MessageConstant {
     public static final String SHOPPING_CART_IS_NOT_EXIST = "您当前删除的商品在购物车中并不存在，请重新选择需要删除的商品！";
     public static final String NOT_FOUND_DEFAULT_ADDRESS = "未查询到默认地址！";
     public static final String BEGIN_TIME_IS_LATER_THAN_END_TIME = "开始时间晚于结束时间，请重新选择起止时间！";
-    public static final String REPORT_EXPORT_EXCEPTION = "统计报表导出发生位置错误，请联系工作人员！";
+    public static final String REPORT_EXPORT_EXCEPTION = "导出统计报表发生未知错误，请联系IT技术支持人员！";
 
 }
